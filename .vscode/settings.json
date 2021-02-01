@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "CMakeLists": "cmake",
+        "chrono": "cpp"
+    }
+}
