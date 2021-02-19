@@ -18,12 +18,21 @@
 
 
 
+// void wireTogether(std::pair<std)
+
+
+// connect(OneA,
+
 int main() {
 
-  Two two;
+  PodOne pod_one;
+  pod_one.timestamp=-12;
 
-  std::function<void (Two,const PodTwo)> callback=&Two::triggerTwo;
-  // callback(two,PodTwo{});
+  Two two;
+  PodOne pod;
+  std::cout<<pod.isValid();
+
+  // std::function<void (Two,const PodTwo)> callback=&Two::triggerTwo;
   OneA one_a(two,&Two::triggerTwo);
   one_a.setPod(PodOne{});
 
