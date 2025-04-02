@@ -15,10 +15,15 @@
 #include <tuple>
 #include <vector>
 
+#include "dummy_classes.h"
+
 int main()
 {
+  StringRuleOfFive item;
+  item.print();
 
-  std::cout << "End" << std::endl;
+  std::cout
+      << "End" << std::endl;
 
   return 0;
 }
