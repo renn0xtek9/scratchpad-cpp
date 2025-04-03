@@ -44,8 +44,14 @@ public:
     }
     void print()
     {
-        std::cout << "StringRuleOfFive print" << std::endl;
+        std::cout << "StringRuleOfFive print from "<<this << std::endl;
     }
+    void add_one_to_a()
+    {
+        a_++;
+    }
+private:
+    int a_{};
 };
 
 class StringDeletedCopyAndMove

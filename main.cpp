@@ -19,8 +19,9 @@
 
 int main()
 {
-  StringRuleOfFive item;
-  item.print();
+  std::unique_ptr<StringRuleOfFive> str_rule_of_five;
+  str_rule_of_five->print(); //works but should not ! is it because the print function is inlined ?
+  str_rule_of_five->add_one_to_a();  //Thins segfault as it should !
 
   std::cout
       << "End" << std::endl;
