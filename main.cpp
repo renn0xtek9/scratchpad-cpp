@@ -5,28 +5,33 @@
 #include <functional>
 #include <thread>
 #include <unistd.h>
+#include <cmath>
 
 #define BILLION 1000000000L
 
+const long int clock_ticks_per_seconds{sysconf(_SC_CLK_TCK)}; // Don't confuse with cpu ticks !
+
 double getCpuFrequency()
 {
-  unsigned int cpuFreq;
+  unsigned int cpu_freq_khz;
   std::ifstream cpuinfo("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
   if (cpuinfo)
   {
-    cpuinfo >> cpuFreq;
+    cpuinfo >> cpu_freq_khz;
     cpuinfo.close();
   }
   else
   {
     throw std::runtime_error("Unable to open cpuinfo_max_freq");
   }
-  return cpuFreq * 1.0e3; // convert from KHz to Hz
+  return cpu_freq_khz * 1.0e3; // convert from KHz to Hz
 }
 
-double ticksToTime(const unsigned long long &ticks, const double cpuFrequency)
+const double cpu_frequency{getCpuFrequency()}; // in Hz
+double cpuTicksToTime(const unsigned long long &cpu_ticks)
 {
-  return ticks / cpuFrequency;
+  // Very not sure about that !
+  return cpu_ticks / cpu_frequency;
 }
 
 struct TimePoint
@@ -52,7 +57,7 @@ struct Duration
         system_clock_duration(end.system_clock_time - start.system_clock_time),
         high_resolution_clock_duration(end.high_resolution_clock_time - start.high_resolution_clock_time),
         rtdsc_elapsed_ticks(end.rtdsc_time - start.rtdsc_time),
-        rtdsc_elapsed_time{ticksToTime(rtdsc_elapsed_ticks, getCpuFrequency())} {}
+        rtdsc_elapsed_time{cpuTicksToTime(rtdsc_elapsed_ticks)} {}
 
   uint64_t monotonic_clock_duration;
   std::chrono::nanoseconds system_clock_duration{};
@@ -61,13 +66,13 @@ struct Duration
   const double rtdsc_elapsed_time{};
 };
 
-void display_duration(const Duration &duration)
+void display_duration(const Duration &duration, const double desired_duration)
 {
-  printf("Duration according: ");
+  printf("Desired %f -- Duration according: ", desired_duration);
   printf("CPU ticks %f; ", duration.rtdsc_elapsed_time);
   printf("high_resolution_clock::now %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.high_resolution_clock_duration).count());
   printf("system_clock %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.system_clock_duration).count());
-  printf("clock_get_time %llu; ", (long long unsigned int)duration.monotonic_clock_duration);
+  printf("clock_get_time %f; ", static_cast<double>(duration.monotonic_clock_duration / 1.0e9));
   printf("Elapsed CPU tick = %llu;", duration.rtdsc_elapsed_ticks);
 
   printf("\n");
@@ -80,7 +85,7 @@ void with_rtdsc_sleep(const double seconds)
   while (!finished)
   {
     auto now = __rdtsc();
-    if (ticksToTime(now - start, getCpuFrequency()) >= seconds)
+    if (cpuTicksToTime(now - start) >= seconds)
     {
       return;
     }
@@ -97,25 +102,43 @@ void with_usleep(const double seconds)
   usleep(microseconds);
 }
 
-void benchmark(const double desired_sleep_time, std::function<void(const double)> custom_sleep_function)
+void with_nanosleep(const double seconds)
+{
+  timespec ts;
+
+  double intPart;
+  double fracPart = modf(seconds, &intPart);
+
+  // Fill the timespec structure
+  ts.tv_sec = intPart;
+  ts.tv_nsec = fracPart * 1e9;
+
+  nanosleep(&ts, NULL);
+}
+
+void benchmark(const double desired_duration, std::function<void(const double)> custom_sleep_function)
 {
   TimePoint start_time_point{};
-  custom_sleep_function(desired_sleep_time);
+  custom_sleep_function(desired_duration);
   TimePoint end_time_point{};
   Duration duration(start_time_point, end_time_point);
-  display_duration(duration);
+  display_duration(duration, desired_duration);
 }
 
 int main()
 {
-  printf("CPU frequency (GHz): %f\n", getCpuFrequency() / 1.0e9);
+  printf("Note: CPU frequency (GHz): %f -- Clock ticks per seconds %ld\n", cpu_frequency / 1.0e9, clock_ticks_per_seconds);
+
+  const auto desired_duration{1.0e-1};
 
   printf("rtdsc benchmark\n");
-  benchmark(1.0e-3, with_rtdsc_sleep);
+  benchmark(desired_duration, with_rtdsc_sleep);
   printf("sleep_for benchmark\n");
-  benchmark(1.0e-3, with_sleep_for);
+  benchmark(desired_duration, with_sleep_for);
   printf("usleep benchmark\n");
-  benchmark(1.0e-3, with_usleep);
+  benchmark(desired_duration, with_usleep);
+  printf("nanosleep benchmark\n");
+  benchmark(desired_duration, with_nanosleep);
 
   return 0;
 }
