@@ -27,7 +27,8 @@ double getCpuFrequency()
   return cpu_freq_khz * 1.0e3; // convert from KHz to Hz
 }
 
-const double cpu_frequency{getCpuFrequency()}; // in Hz
+// const double cpu_frequency{getCpuFrequency()}; // in Hz
+const double cpu_frequency{2.7e9}; // according /proc/cpuinfo
 double cpuTicksToTime(const unsigned long long &cpu_ticks)
 {
   // Very not sure about that !
@@ -129,7 +130,7 @@ int main()
 {
   printf("Note: CPU frequency (GHz): %f -- Clock ticks per seconds %ld\n", cpu_frequency / 1.0e9, clock_ticks_per_seconds);
 
-  const auto desired_duration{1.0e-1};
+  const auto desired_duration{1.0e-4};
 
   printf("rtdsc benchmark\n");
   benchmark(desired_duration, with_rtdsc_sleep);
