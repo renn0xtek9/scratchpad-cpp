@@ -1,16 +1,12 @@
 #include <x86intrin.h>
 #include <fstream>
 #include <chrono>
+#include <time.h>
+#include <functional>
+#include <thread>
+#include <unistd.h>
 
-/// This scratchpad shows how to make a high resolution (subm-microsecond accuracy busy wait).
-/// It uses the __rdtsc() instruction to get the current CPU ticks.
-/// That is, it bypasses the kernel clock. This is required to measure time accurately.
-/// The CPU frequency is obtained from the /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq file.
-/// The CPU frequency is in KHz, so we need to convert it to Hz.
-/// The __rdtsc() is only reset every ~194 years, so we are safe...
-
-/// For matter of comparison, we output the elapsed time that we get from the kernel clock.
-/// This is not accurate, but it is useful to see how much we are off.
+#define BILLION 1000000000L
 
 double getCpuFrequency()
 {
@@ -33,7 +29,51 @@ double ticksToTime(const unsigned long long &ticks, const double cpuFrequency)
   return ticks / cpuFrequency;
 }
 
-void high_resolution_sleep(double seconds)
+struct TimePoint
+{
+  TimePoint() : system_clock_time(std::chrono::system_clock::now()),
+                high_resolution_clock_time(std::chrono::high_resolution_clock::now()),
+                rtdsc_time{__rdtsc()}
+  {
+    clock_gettime(CLOCK_MONOTONIC, &monotonic_clock_time);
+  }
+
+  struct timespec monotonic_clock_time;
+  std::chrono::system_clock::time_point system_clock_time{};
+  std::chrono::high_resolution_clock::time_point high_resolution_clock_time{};
+  const unsigned long long rtdsc_time{};
+};
+
+struct Duration
+{
+  Duration(const TimePoint &start, const TimePoint &end)
+      : monotonic_clock_duration(BILLION * (end.monotonic_clock_time.tv_sec - start.monotonic_clock_time.tv_sec) +
+                                 end.monotonic_clock_time.tv_nsec - start.monotonic_clock_time.tv_nsec),
+        system_clock_duration(end.system_clock_time - start.system_clock_time),
+        high_resolution_clock_duration(end.high_resolution_clock_time - start.high_resolution_clock_time),
+        rtdsc_elapsed_ticks(end.rtdsc_time - start.rtdsc_time),
+        rtdsc_elapsed_time{ticksToTime(rtdsc_elapsed_ticks, getCpuFrequency())} {}
+
+  uint64_t monotonic_clock_duration;
+  std::chrono::nanoseconds system_clock_duration{};
+  std::chrono::high_resolution_clock::duration high_resolution_clock_duration{};
+  const unsigned long long rtdsc_elapsed_ticks{};
+  const double rtdsc_elapsed_time{};
+};
+
+void display_duration(const Duration &duration)
+{
+  printf("Duration according: ");
+  printf("CPU ticks %f; ", duration.rtdsc_elapsed_time);
+  printf("high_resolution_clock::now %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.high_resolution_clock_duration).count());
+  printf("system_clock %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.system_clock_duration).count());
+  printf("clock_get_time %llu; ", (long long unsigned int)duration.monotonic_clock_duration);
+  printf("Elapsed CPU tick = %llu;", duration.rtdsc_elapsed_ticks);
+
+  printf("\n");
+}
+
+void with_rtdsc_sleep(const double seconds)
 {
   bool finished{false};
   auto start = __rdtsc();
@@ -46,32 +86,36 @@ void high_resolution_sleep(double seconds)
     }
   }
 }
-
-void benchmark(const double desired_sleep_time)
+void with_sleep_for(const double seconds)
 {
-  const double cpuFrequency = getCpuFrequency();
+  std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
+}
 
-  const auto chrono_start_time = std::chrono::high_resolution_clock::now();
+void with_usleep(const double seconds)
+{
+  unsigned int microseconds = static_cast<unsigned int>(seconds * 1.0e6);
+  usleep(microseconds);
+}
 
-  const auto start = __rdtsc();
-
-  high_resolution_sleep(desired_sleep_time);
-
-  const auto end = __rdtsc();
-
-  auto high_resolution_delat_t_ms = ticksToTime(end - start, cpuFrequency);
-
-  const auto chrono_end_time = std::chrono::high_resolution_clock::now();
-
-  const auto delta_t_chrono = chrono_end_time - chrono_start_time;
-  const double delta_t_chrono_seconds = std::chrono::duration_cast<std::chrono::duration<double>>(delta_t_chrono).count();
-  printf("elapsed CPU tick = %llu; duration according CPU ticks %f; duration according high_resolution_clock::now %f\n", end - start, high_resolution_delat_t_ms, delta_t_chrono_seconds);
+void benchmark(const double desired_sleep_time, std::function<void(const double)> custom_sleep_function)
+{
+  TimePoint start_time_point{};
+  custom_sleep_function(desired_sleep_time);
+  TimePoint end_time_point{};
+  Duration duration(start_time_point, end_time_point);
+  display_duration(duration);
 }
 
 int main()
 {
+  printf("CPU frequency (GHz): %f\n", getCpuFrequency() / 1.0e9);
 
-  benchmark(1.0e-3);
+  printf("rtdsc benchmark\n");
+  benchmark(1.0e-3, with_rtdsc_sleep);
+  printf("sleep_for benchmark\n");
+  benchmark(1.0e-3, with_sleep_for);
+  printf("usleep benchmark\n");
+  benchmark(1.0e-3, with_usleep);
 
   return 0;
 }
