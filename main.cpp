@@ -35,16 +35,24 @@ double cpuTicksToTime(const unsigned long long &cpu_ticks)
   return cpu_ticks / cpu_frequency;
 }
 
+uint64_t durationFromTimePoint(const timespec &start, const timespec &end)
+{
+  return BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
+}
+
 struct TimePoint
 {
   TimePoint() : system_clock_time(std::chrono::system_clock::now()),
                 high_resolution_clock_time(std::chrono::high_resolution_clock::now()),
                 rtdsc_time{__rdtsc()}
+
   {
-    clock_gettime(CLOCK_MONOTONIC, &monotonic_clock_time);
+    clock_gettime(CLOCK_MONOTONIC, &clock_monotonic_time);
+    clock_gettime(CLOCK_REALTIME, &clock_realtime_time);
   }
 
-  struct timespec monotonic_clock_time;
+  struct timespec clock_monotonic_time;
+  struct timespec clock_realtime_time;
   std::chrono::system_clock::time_point system_clock_time{};
   std::chrono::high_resolution_clock::time_point high_resolution_clock_time{};
   const unsigned long long rtdsc_time{};
@@ -53,14 +61,15 @@ struct TimePoint
 struct Duration
 {
   Duration(const TimePoint &start, const TimePoint &end)
-      : monotonic_clock_duration(BILLION * (end.monotonic_clock_time.tv_sec - start.monotonic_clock_time.tv_sec) +
-                                 end.monotonic_clock_time.tv_nsec - start.monotonic_clock_time.tv_nsec),
+      : clock_monotonic_duration(durationFromTimePoint(start.clock_monotonic_time, end.clock_monotonic_time)),
+        clock_realtime_duration(durationFromTimePoint(start.clock_realtime_time, end.clock_realtime_time)),
         system_clock_duration(end.system_clock_time - start.system_clock_time),
         high_resolution_clock_duration(end.high_resolution_clock_time - start.high_resolution_clock_time),
         rtdsc_elapsed_ticks(end.rtdsc_time - start.rtdsc_time),
         rtdsc_elapsed_time{cpuTicksToTime(rtdsc_elapsed_ticks)} {}
 
-  uint64_t monotonic_clock_duration;
+  uint64_t clock_monotonic_duration;
+  uint64_t clock_realtime_duration;
   std::chrono::nanoseconds system_clock_duration{};
   std::chrono::high_resolution_clock::duration high_resolution_clock_duration{};
   const unsigned long long rtdsc_elapsed_ticks{};
@@ -73,7 +82,8 @@ void display_duration(const Duration &duration, const double desired_duration)
   printf("CPU ticks %f; ", duration.rtdsc_elapsed_time);
   printf("high_resolution_clock::now %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.high_resolution_clock_duration).count());
   printf("system_clock %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.system_clock_duration).count());
-  printf("clock_get_time %f; ", static_cast<double>(duration.monotonic_clock_duration / 1.0e9));
+  printf("CLOCK_MONOTONIC %f; ", static_cast<double>(duration.clock_monotonic_duration / 1.0e9));
+  printf("CLOCK_REALTIME %f; ", static_cast<double>(duration.clock_realtime_duration / 1.0e9));
   printf("Elapsed CPU tick = %llu;", duration.rtdsc_elapsed_ticks);
 
   printf("\n");
