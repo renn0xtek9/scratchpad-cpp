@@ -11,7 +11,7 @@
 
 const long int clock_ticks_per_seconds{sysconf(_SC_CLK_TCK)}; // Don't confuse with cpu ticks !
 
-double getCpuFrequency()
+double getCpuMaxFrequency()
 {
   unsigned int cpu_freq_khz;
   std::ifstream cpuinfo("/sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_max_freq");
@@ -27,7 +27,7 @@ double getCpuFrequency()
   return cpu_freq_khz * 1.0e3; // convert from KHz to Hz
 }
 
-// const double cpu_frequency{getCpuFrequency()}; // in Hz
+// const double cpu_frequency{getCpuMaxFrequency()}; // in Hz
 const double cpu_frequency{2.7e9}; // according /proc/cpuinfo
 double cpuTicksToTime(const unsigned long long &cpu_ticks)
 {
@@ -153,10 +153,9 @@ void with_nanosleep(const double seconds)
 
   double intPart;
   double fracPart = modf(seconds, &intPart);
-
   // Fill the timespec structure
   ts.tv_sec = intPart;
-  ts.tv_nsec = static_cast<long>(fracPart) * 1e9;
+  ts.tv_nsec = static_cast<long>(fracPart * 1e9);
 
   nanosleep(&ts, NULL);
 }
@@ -174,7 +173,7 @@ int main()
 {
   printf("Note: CPU frequency (GHz): %f -- Clock ticks per seconds %ld\n", cpu_frequency / 1.0e9, clock_ticks_per_seconds);
 
-  const auto desired_duration{1.0e-3};
+  const auto desired_duration{1.0e-2};
 
   printf("Sleep function: polling rtdsc (busy wait) \n");
   benchmark(desired_duration, with_rtdsc_sleep);
