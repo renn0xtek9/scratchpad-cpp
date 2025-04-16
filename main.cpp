@@ -35,7 +35,7 @@ double cpuTicksToTime(const unsigned long long &cpu_ticks)
   return cpu_ticks / cpu_frequency;
 }
 
-uint64_t durationFromTimePoint(const timespec &start, const timespec &end)
+uint64_t durationBetweenTimespecs(const timespec &start, const timespec &end)
 {
   return BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 }
@@ -49,10 +49,14 @@ struct TimePoint
   {
     clock_gettime(CLOCK_MONOTONIC, &clock_monotonic_time);
     clock_gettime(CLOCK_REALTIME, &clock_realtime_time);
+    clock_gettime(CLOCK_PROCESS_CPUTIME_ID, &clock_process_cputime_id_time);
+    clock_gettime(CLOCK_THREAD_CPUTIME_ID, &clock_thread_cputime_id_time);
   }
 
   struct timespec clock_monotonic_time;
   struct timespec clock_realtime_time;
+  struct timespec clock_process_cputime_id_time;
+  struct timespec clock_thread_cputime_id_time;
   std::chrono::system_clock::time_point system_clock_time{};
   std::chrono::high_resolution_clock::time_point high_resolution_clock_time{};
   const unsigned long long rtdsc_time{};
@@ -61,15 +65,22 @@ struct TimePoint
 struct Duration
 {
   Duration(const TimePoint &start, const TimePoint &end)
-      : clock_monotonic_duration(durationFromTimePoint(start.clock_monotonic_time, end.clock_monotonic_time)),
-        clock_realtime_duration(durationFromTimePoint(start.clock_realtime_time, end.clock_realtime_time)),
-        system_clock_duration(end.system_clock_time - start.system_clock_time),
+      : clock_monotonic_duration(durationBetweenTimespecs(start.clock_monotonic_time, end.clock_monotonic_time)),
+        clock_realtime_duration(durationBetweenTimespecs(start.clock_realtime_time, end.clock_realtime_time)),
+        clock_process_cputime_id_duration(durationBetweenTimespecs(start.clock_process_cputime_id_time, end.clock_process_cputime_id_time)),
+        clock_thread_cputime_id_duration(durationBetweenTimespecs(start.clock_thread_cputime_id_time, end.clock_thread_cputime_id_time)),
+        system_clock_duration(std::chrono::duration_cast<std::chrono::nanoseconds>(end.system_clock_time - start.system_clock_time).count()),
         high_resolution_clock_duration(end.high_resolution_clock_time - start.high_resolution_clock_time),
         rtdsc_elapsed_ticks(end.rtdsc_time - start.rtdsc_time),
-        rtdsc_elapsed_time{cpuTicksToTime(rtdsc_elapsed_ticks)} {}
+        rtdsc_elapsed_time{cpuTicksToTime(rtdsc_elapsed_ticks)}
+  {
+  }
 
+  // See also https://linux.die.net/man/3/clock_gettime
   uint64_t clock_monotonic_duration;
   uint64_t clock_realtime_duration;
+  uint64_t clock_process_cputime_id_duration;
+  uint64_t clock_thread_cputime_id_duration;
   std::chrono::nanoseconds system_clock_duration{};
   std::chrono::high_resolution_clock::duration high_resolution_clock_duration{};
   const unsigned long long rtdsc_elapsed_ticks{};
@@ -82,8 +93,10 @@ void display_duration(const Duration &duration, const double desired_duration)
   printf("CPU ticks %f; ", duration.rtdsc_elapsed_time);
   printf("high_resolution_clock::now %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.high_resolution_clock_duration).count());
   printf("system_clock %f; ", std::chrono::duration_cast<std::chrono::duration<double>>(duration.system_clock_duration).count());
-  printf("CLOCK_MONOTONIC %f; ", static_cast<double>(duration.clock_monotonic_duration / 1.0e9));
-  printf("CLOCK_REALTIME %f; ", static_cast<double>(duration.clock_realtime_duration / 1.0e9));
+  printf("CLOCK_MONOTONIC %f; ", static_cast<double>(duration.clock_monotonic_duration) / 1.0e9);
+  printf("CLOCK_REALTIME %f; ", static_cast<double>(duration.clock_realtime_duration) / 1.0e9);
+  printf("CLOCK_PROCESS_CPU_TIME_ID %f; ", static_cast<double>(duration.clock_process_cputime_id_duration) / 1.0e9);
+  printf("CLOCK_THREAD_CPUTIME_ID %f; ", static_cast<double>(duration.clock_thread_cputime_id_duration) / 1.0e9);
   printf("Elapsed CPU tick = %llu;", duration.rtdsc_elapsed_ticks);
 
   printf("\n");
@@ -102,6 +115,27 @@ void with_rtdsc_sleep(const double seconds)
     }
   }
 }
+
+void polling_clock(const double seconds, const clockid_t clock_id)
+{
+  timespec start_time_point{};
+  clock_gettime(clock_id, &start_time_point);
+  timespec end_time_point{};
+  do
+  {
+    clock_gettime(clock_id, &end_time_point);
+  } while (durationBetweenTimespecs(start_time_point, end_time_point) < seconds * BILLION);
+}
+
+void with_clock_cpu_process_time_id(const double seconds)
+{
+  polling_clock(seconds, CLOCK_PROCESS_CPUTIME_ID);
+}
+void with_clock_realtime(const double seconds)
+{
+  polling_clock(seconds, CLOCK_REALTIME);
+}
+
 void with_sleep_for(const double seconds)
 {
   std::this_thread::sleep_for(std::chrono::duration<double>(seconds));
@@ -122,7 +156,7 @@ void with_nanosleep(const double seconds)
 
   // Fill the timespec structure
   ts.tv_sec = intPart;
-  ts.tv_nsec = fracPart * 1e9;
+  ts.tv_nsec = static_cast<long>(fracPart) * 1e9;
 
   nanosleep(&ts, NULL);
 }
@@ -140,15 +174,19 @@ int main()
 {
   printf("Note: CPU frequency (GHz): %f -- Clock ticks per seconds %ld\n", cpu_frequency / 1.0e9, clock_ticks_per_seconds);
 
-  const auto desired_duration{1.0e-4};
+  const auto desired_duration{1.0e-3};
 
-  printf("rtdsc benchmark\n");
+  printf("Sleep function: polling rtdsc (busy wait) \n");
   benchmark(desired_duration, with_rtdsc_sleep);
-  printf("sleep_for benchmark\n");
+  printf("\nSleep function: polling CLOCK_PROCESS_CPU_ID_TIME (busy wait) \n");
+  benchmark(desired_duration, with_clock_cpu_process_time_id);
+  printf("\nSleep function: polling CLOCK_REALTIME (busy wait) \n");
+  benchmark(desired_duration, with_clock_realtime);
+  printf("\nSleep function: sleep_for\n");
   benchmark(desired_duration, with_sleep_for);
-  printf("usleep benchmark\n");
+  printf("\nSleep function: usleep\n");
   benchmark(desired_duration, with_usleep);
-  printf("nanosleep benchmark\n");
+  printf("\nSleep function: nanosleep\n");
   benchmark(desired_duration, with_nanosleep);
 
   return 0;
