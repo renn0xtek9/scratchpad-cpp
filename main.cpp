@@ -155,7 +155,7 @@ void with_nanosleep(const double seconds)
   double fracPart = modf(seconds, &intPart);
   // Fill the timespec structure
   ts.tv_sec = intPart;
-  ts.tv_nsec = static_cast<long>(fracPart * 1e9);
+  ts.tv_nsec = static_cast<long>(fracPart) * 1e9;
 
   nanosleep(&ts, NULL);
 }
