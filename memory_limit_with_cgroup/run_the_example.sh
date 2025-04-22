@@ -1,4 +1,6 @@
 #!/bin/bash 
+DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+cd "$DIR"/..
 CGROUPNAME="scratchpad"
 BYTES="1048576" # 1MB
 echo "This will create the cgroup $CGROUPNAME and set its maximum memory limit to $BYTES bytes"
@@ -11,8 +13,8 @@ echo "$BYTES" | sudo tee /sys/fs/cgroup/memory/"$CGROUPNAME"/memory.memsw.limit_
 sudo chown -R "$USER" /sys/fs/cgroup/memory/"$CGROUPNAME"
 
 # Build the executable
-cmake --B build 
+cmake -B build 
 cmake --build build
 
 # Runit with cgexec to enforce the memory limit
-cgexec -g memory:scratchpad $(pwd)/build/main
+cgexec -g memory:scratchpad $(pwd)/build/memory_limit_with_cgroup/memory_limit_cgroup
