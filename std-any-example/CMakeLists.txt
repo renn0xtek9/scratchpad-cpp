@@ -1,13 +1,11 @@
-set(CMAKE_CXX_STANDARD 17)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-get_filename_component(DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
-set(EXECUTABLE_NAME ${DIR_NAME})
+# set(CMAKE_CXX_STANDARD 17) set(CMAKE_CXX_STANDARD_REQUIRED True)
+# get_filename_component(DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+# set(EXECUTABLE_NAME ${DIR_NAME})
 
-add_executable(${EXECUTABLE_NAME} main.cpp)
-target_link_libraries(${EXECUTABLE_NAME} pthread)
+# add_executable(${EXECUTABLE_NAME} main.cpp)
+# target_link_libraries(${EXECUTABLE_NAME} pthread)
 
-install(
-  TARGETS ${EXECUTABLE_NAME}
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+# install( TARGETS ${EXECUTABLE_NAME} RUNTIME DESTINATION bin LIBRARY
+# DESTINATION lib ARCHIVE DESTINATION lib)
+
+my_add_executable(CPP_STANDARD 17)

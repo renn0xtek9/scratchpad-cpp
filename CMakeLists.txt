@@ -1,5 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 project(Scratchpad)
+set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+include(add_executable)
 add_subdirectory(dummy_classes)
 add_subdirectory(memory_limit_with_cgroup)
 add_subdirectory(sleep_methods)

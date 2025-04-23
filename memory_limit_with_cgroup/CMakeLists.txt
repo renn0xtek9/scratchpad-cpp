@@ -1,13 +1,1 @@
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED True)
-
-set(EXECUTABLE_NAME memory_limit_cgroup)
-
-add_executable(${EXECUTABLE_NAME} main.cpp)
-target_link_libraries(${EXECUTABLE_NAME} pthread)
-
-install(
-  TARGETS ${EXECUTABLE_NAME}
-  RUNTIME DESTINATION bin
-  LIBRARY DESTINATION lib
-  ARCHIVE DESTINATION lib)
+my_add_executable(CPP_STANDARD 14)
