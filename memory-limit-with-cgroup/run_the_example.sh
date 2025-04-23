@@ -17,4 +17,4 @@ cmake -B build
 cmake --build build
 
 # Runit with cgexec to enforce the memory limit
-cgexec -g memory:scratchpad $(pwd)/build/memory_limit_with_cgroup/memory_limit_cgroup
+cgexec -g memory:scratchpad $(pwd)/build/memory-limit-with-cgroup/memory-limit-with-cgroup
