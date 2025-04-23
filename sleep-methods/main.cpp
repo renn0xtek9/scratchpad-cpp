@@ -6,6 +6,7 @@
 #include <thread>
 #include <unistd.h>
 #include <cmath>
+#include <immintrin.h>
 
 #define BILLION 1000000000L
 
@@ -127,6 +128,18 @@ void polling_clock(const double seconds, const clockid_t clock_id)
   } while (durationBetweenTimespecs(start_time_point, end_time_point) < seconds * BILLION);
 }
 
+void polling_clock_and_mm_pause(const double seconds, const clockid_t clock_id)
+{
+  timespec start_time_point{};
+  clock_gettime(clock_id, &start_time_point);
+  timespec end_time_point{};
+  do
+  {
+    clock_gettime(clock_id, &end_time_point);
+    _mm_pause();
+  } while (durationBetweenTimespecs(start_time_point, end_time_point) < seconds * BILLION);
+}
+
 void with_clock_cpu_process_time_id(const double seconds)
 {
   polling_clock(seconds, CLOCK_PROCESS_CPUTIME_ID);
@@ -134,6 +147,15 @@ void with_clock_cpu_process_time_id(const double seconds)
 void with_clock_realtime(const double seconds)
 {
   polling_clock(seconds, CLOCK_REALTIME);
+}
+
+void with_clock_cpu_process_time_id_and_mm_pause(const double seconds)
+{
+  polling_clock_and_mm_pause(seconds, CLOCK_PROCESS_CPUTIME_ID);
+}
+void with_clock_realtime_and_mm_pause(const double seconds)
+{
+  polling_clock_and_mm_pause(seconds, CLOCK_REALTIME);
 }
 
 void with_sleep_for(const double seconds)
@@ -179,8 +201,12 @@ int main()
   benchmark(desired_duration, with_rtdsc_sleep);
   printf("\nSleep function: polling CLOCK_PROCESS_CPU_ID_TIME (busy wait) \n");
   benchmark(desired_duration, with_clock_cpu_process_time_id);
+  printf("\nSleep function: polling CLOCK_PROCESS_CPU_ID_TIME (busy wait) and _mm_pause\n");
+  benchmark(desired_duration, with_clock_cpu_process_time_id_and_mm_pause);
   printf("\nSleep function: polling CLOCK_REALTIME (busy wait) \n");
   benchmark(desired_duration, with_clock_realtime);
+  printf("\nSleep function: polling CLOCK_REALTIME and _mm_pause (busy wait) \n");
+  benchmark(desired_duration, with_clock_realtime_and_mm_pause);
   printf("\nSleep function: sleep_for\n");
   benchmark(desired_duration, with_sleep_for);
   printf("\nSleep function: usleep\n");
