@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 project(Scratchpad)
 set(CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+file(MAKE_DIRECTORY "${CMAKE_INSTALL_PREFIX}")
 include(add_executable)
 add_subdirectory(dummy-classes)
 add_subdirectory(memory-limit-with-cgroup)

@@ -1,0 +1,22 @@
+#!/usr/bin/gnuplot
+# Settings
+set term pngcairo size 800,1000 enhanced
+set output "${CMAKE_INSTALL_PREFIX}/sleep_benchmarking.png"
+set datafile separator ";"
+
+# Ignore the header row
+set key autotitle columnheader
+
+# Labels
+set title "Difference in sleep duration (according CLOCK\\_REALTIME)"
+set xlabel "Method"
+set ylabel "Delta ({/Symbol m}s)" 
+
+set xtics rotate
+set yrange [0:300]
+
+
+
+set style fill solid 
+set boxwidth 0.5
+plot "sleep-benchmark-file.csv" using (column(0)):(1.0e6*abs((column('CLOCK_REALTIME')-(column('Desired'))))):xtic(1) with boxes notitle
