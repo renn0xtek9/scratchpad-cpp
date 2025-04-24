@@ -15,6 +15,7 @@
 
 #include "types.h"
 #include "utils.h"
+#include "definitions.h"
 
 const long int clock_ticks_per_seconds{sysconf(_SC_CLK_TCK)}; // Don't confuse with cpu ticks !
 
@@ -22,7 +23,7 @@ int main()
 {
   printf("Note: CPU frequency (GHz): %f -- Clock ticks per seconds %ld -- CPU load %f\n", cpu_frequency / 1.0e9, clock_ticks_per_seconds, get_cpu_load());
 
-  const auto desired_duration{1.0e-2};
+  const auto desired_duration{SLEEP_TIME_NOMINAL};
 
   std::vector<BenchmarkCondition> benchmark_conditions{
       BenchmarkCondition("rtdsc", desired_duration, with_rtdsc_sleep),

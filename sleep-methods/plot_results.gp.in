@@ -9,7 +9,7 @@ set datafile separator ";"
 set key autotitle columnheader
 
 # Labels
-set title "Difference in sleep duration (according CLOCK\\_REALTIME)"
+set title "Difference in sleep duration (according CLOCK\\_REALTIME)\n{/*0.5 Sleep duration ${CMAKE_SLEEP_TIME_NOMINAL} s}"
 set xlabel "Method"
 set ylabel "Delta ({/Symbol m}s)" 
 

@@ -1,0 +1,4 @@
+#ifndef DEFINITIONS_H
+#define DEFINITIONS_H
+constexpr double SLEEP_TIME_NOMINAL{${CMAKE_SLEEP_TIME_NOMINAL}};
+#endif
