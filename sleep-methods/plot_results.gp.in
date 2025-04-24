@@ -1,7 +1,8 @@
 #!/usr/bin/gnuplot
 # Settings
 set term pngcairo size 800,1000 enhanced
-set output "${CMAKE_INSTALL_PREFIX}/sleep_benchmarking.png"
+set output "${CMAKE_INSTALL_PREFIX}/share/sleep-methods/sleep_benchmarking.png"
+#set output "sleep_benchmarking.png"
 set datafile separator ";"
 
 # Ignore the header row
@@ -19,4 +20,4 @@ set yrange [0:300]
 
 set style fill solid 
 set boxwidth 0.5
-plot "sleep-benchmark-file.csv" using (column(0)):(1.0e6*abs((column('CLOCK_REALTIME')-(column('Desired'))))):xtic(1) with boxes notitle
+plot "./sleep-benchmark-file.csv" using (column(0)):(1.0e6*abs((column('CLOCK_REALTIME')-(column('Desired'))))):xtic(1) with boxes notitle

@@ -163,7 +163,7 @@ Duration benchmark(const double desired_duration, std::function<void(const doubl
     }
     else
     {
-        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Give the child process time to start
+        std::this_thread::sleep_for(std::chrono::milliseconds(500)); // Give the child process time to start
         // Parent process
         if (stress)
         {

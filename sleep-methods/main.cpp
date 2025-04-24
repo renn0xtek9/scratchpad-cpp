@@ -45,11 +45,14 @@ int main()
   std::map<std::string, Duration> results{};
   for (const auto &benchmark_condition : benchmark_conditions)
   {
-    printf("\nSleep function: %s \n", benchmark_condition.name_.c_str());
+    std::cout << "Sleep function: " << benchmark_condition.name_ << std::endl;
     results.emplace(benchmark_condition.name_, benchmark(benchmark_condition.desired_duration_, benchmark_condition.custom_sleep_function_, benchmark_condition.stress_system_));
   }
 
-  std::ofstream output_file("sleep-benchmark-file.csv");
+  const auto executable_path = std::filesystem::path(get_path_of_current_executable());
+  const std::filesystem::path csv_path = executable_path.parent_path().parent_path() / "share" / "sleep-methods" / "sleep-benchmark-file.csv";
+
+  std::ofstream output_file(csv_path.string().c_str());
   output_file << "Sleep function;Desired;CPU ticks;high_resolution_clock::now;system_clock;CLOCK_MONOTONIC;CLOCK_REALTIME;CLOCK_PROCESS_CPU_TIME_ID;CLOCK_THREAD_CPUTIME_ID\n";
   for (const auto &result : results)
   {
@@ -65,10 +68,14 @@ int main()
     output_file << "\n";
   }
   output_file.close();
-  std::cout << "Results saved in sleep-benchmark-file.csv" << std::endl;
+  std::cout << "Results saved in " << csv_path.string() << std::endl;
 
-  auto gnuplot_script = std::filesystem::path(get_path_of_current_executable()).parent_path().parent_path() / "share" / "sleep-methods" / "plot_results.gp";
+  auto gnuplot_script = executable_path.parent_path().parent_path() / "share" / "sleep-methods" / "plot_results.gp";
 
+  if (chdir(gnuplot_script.parent_path().c_str()) != 0)
+  {
+    std::cerr << "Permission denied: " << gnuplot_script.parent_path().string() << std::endl;
+  }
   if (std::system(gnuplot_script.string().c_str()) != 0)
   {
     std::cerr << "Error: Unable to run gnuplot script" << std::endl;
