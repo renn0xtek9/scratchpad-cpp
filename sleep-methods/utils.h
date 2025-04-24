@@ -1,8 +1,10 @@
 #ifndef UTILS_H
 #define UTILS_H
 
+#include <filesystem>
 #include <functional>
 #include "types.h"
+
 double get_cpu_load();
 double getCpuMaxFrequency();
 void display_duration(const Duration &duration, const double desired_duration);
@@ -17,5 +19,16 @@ void with_sleep_for(const double seconds);
 void with_usleep(const double seconds);
 void with_nanosleep(const double seconds);
 Duration benchmark(const double desired_duration, std::function<void(const double)> custom_sleep_function, const bool stress = false);
+
+bool assert_cpu_load_high();
+bool assert_cpu_load_low();
+
+struct CpuTimes
+{
+    std::uint64_t idle{0U};
+    std::uint64_t total{0U};
+};
+
+std::filesystem::path get_path_of_current_executable();
 
 #endif

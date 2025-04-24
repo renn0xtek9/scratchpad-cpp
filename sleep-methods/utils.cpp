@@ -1,12 +1,15 @@
 #include <fstream>
 #include <thread>
 #include <cmath>
+#include <filesystem>
 
 #include <x86intrin.h>
 #include <unistd.h>
 #include <wait.h>
-
+#include <iostream>
 #include "utils.h"
+#include "types.h"
+#include <limits.h>
 double getCpuMaxFrequency()
 {
     unsigned int cpu_freq_khz;
@@ -117,6 +120,35 @@ void with_nanosleep(const double seconds)
     nanosleep(&ts, NULL);
 }
 
+bool assert_cpu_load_high()
+{
+    const auto cpu_load = get_cpu_load();
+    if (cpu_load < MAX_CPU_LOAD_FOR_NON_STRESSED)
+    {
+        std::cerr << "Error: CPU load is too low ( " << cpu_load << "%), stress command may not be running" << std::endl;
+        return false;
+    }
+    else
+    {
+        std::cout << "CPU load: " << cpu_load << "%" << std::endl;
+    }
+    return true;
+}
+bool assert_cpu_load_low()
+{
+    const auto cpu_load = get_cpu_load();
+    if (cpu_load > MIN_CPU_LOAD_FOR_STRESSED)
+    {
+        std::cerr << "Error: CPU load is too high ( " << cpu_load << "%), stress command still may running" << std::endl;
+        return false;
+    }
+    else
+    {
+        std::cout << "CPU load: " << cpu_load << "%" << std::endl;
+    }
+    return true;
+}
+
 Duration benchmark(const double desired_duration, std::function<void(const double)> custom_sleep_function, const bool stress)
 {
     pid_t child_pid = fork();
@@ -125,44 +157,90 @@ Duration benchmark(const double desired_duration, std::function<void(const doubl
     {
         if (stress)
         {
-            // TODO(@renn0xtek9): use std::system instead of execl
-            // TODO(@renn0xtek9): qualify and validate the stress command !
-            execl("/usr/bin/stress", "stress", "--cpu", "20", "--timeout", "10", (char *)nullptr);
+            execl("/usr/bin/stress", "/usr/bin/stress", "--cpu", "20", "--timeout", "10", (char *)nullptr);
         }
         exit(0);
     }
     else
     {
+        std::this_thread::sleep_for(std::chrono::milliseconds(50)); // Give the child process time to start
         // Parent process
-        std::this_thread::sleep_for(std::chrono::milliseconds(100)); // Give the child process time to start
+        if (stress)
+        {
+
+            if (!assert_cpu_load_high())
+            {
+                kill(child_pid, SIGKILL);
+                waitpid(child_pid, nullptr, 0);
+                exit(1);
+                return {{}, {}};
+            }
+        }
+        else
+        {
+            if (!assert_cpu_load_low())
+            {
+                exit(1);
+            };
+        }
         TimePoint start_time_point{};
         custom_sleep_function(desired_duration);
         TimePoint end_time_point{};
         Duration duration(start_time_point, end_time_point);
         display_duration(duration, desired_duration);
 
-        kill(child_pid, SIGTERM);
+        int ret = std::system("pkill -9 stress"); // Somehow stress spawn lot of subprocess detached from the child_pid.
+        kill(child_pid, SIGKILL);
         waitpid(child_pid, nullptr, 0);
         return duration;
     }
     return {{}, {}};
 }
 
+CpuTimes get_cpu_times()
+{
+    std::ifstream proc_stat("/proc/stat");
+    std::string cpu;
+    CpuTimes times;
+
+    if (proc_stat.is_open() && proc_stat.good())
+    {
+        proc_stat >> cpu;
+        for (int i = 0; i < 10; ++i)
+        {
+            std::uint64_t time;
+            proc_stat >> time;
+            times.total += time;
+            if (i == 3)
+            { // idle times
+                times.idle = time;
+            }
+        }
+    }
+    return times;
+}
+
 double get_cpu_load()
 {
-    std::ifstream fileStat("/proc/stat");
-    char cpu;
-    std::string tmp;
-    long double a[10];
+    CpuTimes times_begin = get_cpu_times();
+    std::this_thread::sleep_for(std::chrono::milliseconds(100)); // sleep 0.1 seconds
+    CpuTimes times_end = get_cpu_times();
 
-    fileStat >> tmp;
-    for (int i = 0; i < 10; ++i)
+    auto idle_time_diff = times_end.idle - times_begin.idle;
+    auto total_time_diff = times_end.total - times_begin.total;
+
+    if (total_time_diff == 0)
     {
-        fileStat >> a[i];
+        return -1.0; // Error: total time didn't change.
     }
-    if (a[3] < 0.00000001)
-    {
-        return -1.0; // idle cpu takes all time
-    }
-    return ((a[0] + a[1] + a[2]) / a[3]) * 100;
+
+    return 100.0 * (total_time_diff - idle_time_diff) / total_time_diff; // return as a percentage
+}
+
+std::filesystem::path get_path_of_current_executable()
+{
+    char result[PATH_MAX];
+    ssize_t count = readlink("/proc/self/exe", result, PATH_MAX);
+    std::string full_path = std::string(result, (count > 0) ? count : 0);
+    return std::filesystem::path(full_path);
 }

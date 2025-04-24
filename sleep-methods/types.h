@@ -5,6 +5,10 @@
 #include <functional>
 
 #define BILLION 1000000000L
+
+constexpr double MAX_CPU_LOAD_FOR_NON_STRESSED{13.0};
+constexpr double MIN_CPU_LOAD_FOR_STRESSED{90.0};
+
 const double cpu_frequency{2.7e9}; // according /proc/cpuinfo
 inline double cpuTicksToTime(const unsigned long long &cpu_ticks)
 {

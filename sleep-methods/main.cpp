@@ -1,6 +1,7 @@
 
 
 #include <fstream>
+#include <filesystem>
 
 #include <immintrin.h>
 #include <signal.h>
@@ -64,9 +65,11 @@ int main()
     output_file << "\n";
   }
   output_file.close();
-  printf("Results saved in sleep-benchmark-file.csv\n");
+  std::cout << "Results saved in sleep-benchmark-file.csv" << std::endl;
 
-  if (std::system("./plot_results.gp") != 0)
+  auto gnuplot_script = std::filesystem::path(get_path_of_current_executable()).parent_path().parent_path() / "share" / "sleep-methods" / "plot_results.gp";
+
+  if (std::system(gnuplot_script.string().c_str()) != 0)
   {
     std::cerr << "Error: Unable to run gnuplot script" << std::endl;
     return 1;
