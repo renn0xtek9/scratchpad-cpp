@@ -2,16 +2,16 @@
 
 #include <fstream>
 #include <filesystem>
+#include <vector>
+#include <cstdlib>
+#include <map>
+#include <iostream>
 
 #include <immintrin.h>
 #include <signal.h>
 #include <sys/types.h>
 #include <time.h>
 #include <unistd.h>
-#include <vector>
-#include <map>
-#include <cstdlib>
-#include <iostream>
 
 #include "types.h"
 #include "utils.h"
@@ -19,10 +19,8 @@
 
 const long int clock_ticks_per_seconds{sysconf(_SC_CLK_TCK)}; // Don't confuse with cpu ticks !
 
-int main()
+void benchmark_all_methods_for_sleep_time_nominal()
 {
-  printf("Note: CPU frequency (GHz): %f -- Clock ticks per seconds %ld -- CPU load %f\n", cpu_frequency / 1.0e9, clock_ticks_per_seconds, get_cpu_load());
-
   const auto desired_duration{SLEEP_TIME_NOMINAL};
 
   std::vector<BenchmarkCondition> benchmark_conditions{
@@ -70,7 +68,37 @@ int main()
   }
   output_file.close();
   std::cout << "Results saved in " << csv_path.string() << std::endl;
+}
 
+void benchmark_clock_real_time_distribution(const std::string csv_filename, const bool stress)
+{
+  const auto desired_duration{SLEEP_TIME_NOMINAL};
+  const std::size_t result_size{100U};
+  BenchmarkCondition benchmark_condition("REALTIME + mm pause (stressed)", desired_duration, with_clock_realtime_and_mm_pause, stress);
+  std::vector<Duration> results{};
+  for (int i = 0; i < result_size; i++)
+  {
+    results.push_back(benchmark(benchmark_condition.desired_duration_, benchmark_condition.custom_sleep_function_, benchmark_condition.stress_system_));
+  }
+
+  const auto executable_path = std::filesystem::path(get_path_of_current_executable());
+  const std::filesystem::path csv_path = executable_path.parent_path().parent_path() / "share" / "sleep-methods" / csv_filename.c_str();
+
+  std::ofstream output_file(csv_path.string().c_str());
+  output_file << "Iteration;Duration\n";
+  for (int index = 0; index < results.size(); index++)
+  {
+    output_file << index << ";";
+    output_file << std::abs(desired_duration - static_cast<double>(results.at(index).clock_realtime_duration) / 1.0e9) * 1.0e6 << ";";
+    output_file << std::endl;
+  }
+  output_file.close();
+  std::cout << "Results saved in " << csv_path.string() << std::endl;
+}
+
+void run_gnuplot()
+{
+  const auto executable_path = std::filesystem::path(get_path_of_current_executable());
   auto gnuplot_script = executable_path.parent_path().parent_path() / "share" / "sleep-methods" / "plot_results.gp";
 
   if (chdir(gnuplot_script.parent_path().c_str()) != 0)
@@ -80,8 +108,18 @@ int main()
   if (std::system(gnuplot_script.string().c_str()) != 0)
   {
     std::cerr << "Error: Unable to run gnuplot script" << std::endl;
-    return 1;
+    return;
   };
+}
+
+int main()
+{
+  std::cout << "Note: CPU frequency (GHz): " << cpu_frequency / 1.0e9 << " -- Clock ticks per seconds " << clock_ticks_per_seconds << " -- CPU load " << get_cpu_load() << std::endl;
+
+  benchmark_all_methods_for_sleep_time_nominal();
+  benchmark_clock_real_time_distribution("clock_realtime_idle_delta_microseconds.csv", false);
+  benchmark_clock_real_time_distribution("clock_realtime_stressed_delta_microseconds.csv", true);
+  run_gnuplot();
 
   return 0;
 }

@@ -167,7 +167,6 @@ Duration benchmark(const double desired_duration, std::function<void(const doubl
         // Parent process
         if (stress)
         {
-
             if (!assert_cpu_load_high())
             {
                 kill(child_pid, SIGKILL);

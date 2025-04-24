@@ -1,6 +1,6 @@
 my_add_executable(CPP_STANDARD 17 SRCS main.cpp utils.cpp)
 
-set(CMAKE_SLEEP_TIME_NOMINAL 0.01)
+set(CMAKE_SLEEP_TIME_NOMINAL 0.0005)
 
 target_link_libraries(sleep-methods -lstdc++fs)
 target_include_directories(sleep-methods PRIVATE ${CMAKE_CURRENT_BINARY_DIR})

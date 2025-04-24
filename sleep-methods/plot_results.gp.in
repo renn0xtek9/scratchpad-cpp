@@ -2,7 +2,6 @@
 # Settings
 set term pngcairo size 800,1000 enhanced
 set output "${CMAKE_INSTALL_PREFIX}/share/sleep-methods/sleep_benchmarking.png"
-#set output "sleep_benchmarking.png"
 set datafile separator ";"
 
 # Ignore the header row
@@ -21,3 +20,20 @@ set yrange [0:300]
 set style fill solid 
 set boxwidth 0.5
 plot "./sleep-benchmark-file.csv" using (column(0)):(1.0e6*abs((column('CLOCK_REALTIME')-(column('Desired'))))):xtic(1) with boxes notitle
+
+
+
+unset yrange
+set output "${CMAKE_INSTALL_PREFIX}/share/sleep-methods/clock_realtime_idle.png" 
+set title "Sleep via CLOCK\\_REALTIME method with stressed CPU\n{/*0.5 Sleep duration ${CMAKE_SLEEP_TIME_NOMINAL} s}"
+set xlabel "Iteration"
+set ylabel "Delta ({/Symbol m}s)"
+plot "./clock_realtime_idle_delta_microseconds.csv" using 1:2 with boxes notitle
+
+
+unset yrange
+set output "${CMAKE_INSTALL_PREFIX}/share/sleep-methods/clock_realtime_stressed.png" 
+set title "Sleep via CLOCK\\_REALTIME method with stressed CPU\n{/*0.5 Sleep duration ${CMAKE_SLEEP_TIME_NOMINAL} s}"
+set xlabel "Iteration"
+set ylabel "Delta ({/Symbol m}s)"
+plot "./clock_realtime_stressed_delta_microseconds.csv" using 1:2 with boxes notitle
