@@ -1,5 +1,10 @@
 {
-    "version": 8,
+    "version": 10,
+    "cmakeMinimumRequired": {
+        "major": 4,
+        "minor": 0,
+        "patch": 0
+    },
     "configurePresets": [
         {
             "name": "release",
@@ -10,7 +15,30 @@
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
-            }
+            },
+            "graphviz": "${sourceDir}/build/${presetName}/cmake.dot"
+        },
+        {
+            "name": "release-makefile",
+            "displayName": "Custom configure preset",
+            "description": "Sets Ninja generator, build and install directory",
+            "generator": "Unix Makefiles",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Release",
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+            },
+            "graphviz": "${sourceDir}/build/${presetName}/cmake.dot"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "release",
+            "configurePreset": "release"
+        },
+        {
+            "name": "release-makefile",
+            "configurePreset": "release-makefile"
         }
     ]
 }
