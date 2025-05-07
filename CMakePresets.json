@@ -7,34 +7,34 @@
     },
     "configurePresets": [
         {
-            "name": "release",
+            "name": "release-ninja",
             "displayName": "Ninja - release ",
             "description": "Sets Ninja generator, build and install directory",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
             },
-            "graphviz": "${sourceDir}/build/${presetName}/cmake.dot"
+            "graphviz": "${sourceDir}/build/cmake.dot"
         },
         {
             "name": "release-makefile",
             "displayName": "Makefile - release",
-            "description": "Sets Ninja generator, build and install directory",
+            "description": "Sets Makefile generator, build and install directory",
             "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build/${presetName}",
+            "binaryDir": "${sourceDir}/build",
             "cacheVariables": {
                 "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
             },
-            "graphviz": "${sourceDir}/build/${presetName}/cmake.dot"
+            "graphviz": "${sourceDir}/build/cmake.dot"
         }
     ],
     "buildPresets": [
         {
-            "name": "release",
-            "configurePreset": "release"
+            "name": "release-ninja",
+            "configurePreset": "release-ninja"
         },
         {
             "name": "release-makefile",

@@ -1,0 +1,2 @@
+add_subdirectory(udp_packet_receiver)
+add_subdirectory(udp_packet_sender)
