@@ -1,24 +1,18 @@
-// ReceiverUDPPacket.cpp
-
 #include <iostream>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <unistd.h>
 #include <csignal>
 
-constexpr int PORT = 8080;         // Set your port
-constexpr char IP[] = "127.0.0.1"; // Set your IP
-
+#include "arguments_parsing.h"
 void signalHandler(int signum)
 {
     std::cout << "\nInterrupt signal (" << signum << ") received. Exiting gracefully...\n";
     exit(signum);
 }
 
-int main()
+int main(int argc, char *argv[])
 {
+    const IpAndPortConfig config = get_ip_and_port_from_arguments(argc, argv);
     std::signal(SIGINT, signalHandler);
     int sockfd = socket(AF_INET, SOCK_DGRAM, 0);
 
@@ -31,8 +25,8 @@ int main()
     struct sockaddr_in server;
 
     server.sin_family = AF_INET;
-    server.sin_port = htons(PORT);
-    server.sin_addr.s_addr = inet_addr(IP);
+    server.sin_port = htons(config.port);
+    server.sin_addr.s_addr = inet_addr(config.ip.c_str());
 
     if (bind(sockfd, (struct sockaddr *)&server, sizeof(server)) == -1)
     {
@@ -43,7 +37,7 @@ int main()
     while (true)
     {
 
-        std::cout << "Waiting for a message on " << IP << ":" << PORT << "...\n";
+        std::cout << "Waiting for a message on " << config.ip << ":" << config.port << "...\n";
 
         char msg[1024];
         socklen_t serverLen = sizeof(server);
