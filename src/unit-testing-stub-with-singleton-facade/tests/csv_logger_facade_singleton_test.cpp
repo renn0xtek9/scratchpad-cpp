@@ -4,6 +4,8 @@
 
 struct DummyData {};
 
+int mock_id_used = -1;
+
 class DummyMock : public CsvLoggerInterface<DummyData> {
  public:
   DummyMock() {
@@ -13,14 +15,32 @@ class DummyMock : public CsvLoggerInterface<DummyData> {
 
   // Mock implementation of initHeader
   void initHeader() override {
-    std::cout << "DummyMock - : Initializing CSV header." << std::endl;
+    mock_id_used = mock_id;
   }
 
   // Mock implementation of logLine
   void logLine(DummyData data) override {
-    std::cout << "DummyMock - : Logging data " << std::endl;
+    mock_id_used = mock_id;
   }
   static int id;
+  const static int mock_id = 1;
+};
+
+class AlternativeMock : public CsvLoggerInterface<DummyData> {
+ public:
+  AlternativeMock() = default;
+  ~AlternativeMock() override = default;
+
+  // Mock implementation of initHeader
+  void initHeader() override {
+    mock_id_used = mock_id;
+  }
+
+  // Mock implementation of logLine
+  void logLine(DummyData data) override {
+    mock_id_used = mock_id;
+  }
+  const static int mock_id = 2;
 };
 
 int DummyMock::id = 0;
@@ -64,6 +84,12 @@ int main(int argc, char const* argv[]) {
   assert(dummy_writer->id == 1);  // Ensure the same instance is used
   facade3.getLoggerInterface().initHeader();
   assert(dummy_writer->id == 1);  // Ensure the same instance is used
+
+  auto second_dummy_mock = std::make_shared<AlternativeMock>();
+
+  CsvLoggerFacadeSingleton<DummyData>::setLoggerInterface(second_dummy_mock);
+  CsvLoggerFacadeSingleton<DummyData>::get().getLoggerInterface().initHeader();
+  assert(mock_id_used == 1);
 
   return 0;
 }

@@ -29,12 +29,16 @@ class CsvLoggerFacadeSingleton {
   ~CsvLoggerFacadeSingleton() = default;
 
   static void setLoggerInterface(std::shared_ptr<CsvLoggerInterface<Data>> default_logger_interface) {
+    if (csv_logger_interface_) {
+      return;
+    }
+
     if (csv_logger_interface_ != default_logger_interface) {
       csv_logger_interface_ = default_logger_interface;
     }
 
     if (!csv_logger_interface_) {
-      throw std::runtime_error("CsvLoggerFacadeSingleton cannot be initializat without valid CsvLoggerInterface.");
+      throw std::runtime_error("CsvLoggerFacadeSingleton cannot be initializated without valid CsvLoggerInterface.");
     }
   }
 
