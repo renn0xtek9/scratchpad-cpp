@@ -1,6 +1,6 @@
-function(my_add_executable)
+function (my_add_executable)
 
-  cmake_parse_arguments(
+  cmake_parse_arguments (
     arg # prefix of output variables i.e. arguments will be retrieved as
     # ARG_FOO ARG_BAR
     "" # ; separated list of names of boolean arguments (only defined ones will
@@ -11,34 +11,33 @@ function(my_add_executable)
     # ones
   )
 
-  if(NOT arg_CPP_STANDARD)
-    set(arg_CPP_STANDARD 14)
-  endif(NOT arg_CPP_STANDARD)
+  if (NOT arg_CPP_STANDARD)
+    set (arg_CPP_STANDARD 14)
+  endif (NOT arg_CPP_STANDARD)
 
-  if(NOT arg_SRCS)
-    set(arg_SRCS main.cpp)
-  endif(NOT arg_SRCS)
+  if (NOT arg_SRCS)
+    set (arg_SRCS main.cpp)
+  endif (NOT arg_SRCS)
 
-  set(CMAKE_CXX_STANDARD ${arg_CPP_STANDARD})
-  set(CMAKE_CXX_STANDARD_REQUIRED True)
+  set (CMAKE_CXX_STANDARD ${arg_CPP_STANDARD})
+  set (CMAKE_CXX_STANDARD_REQUIRED True)
   if (NOT arg_NAME)
-    get_filename_component(DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
-    set(EXECUTABLE_NAME ${DIR_NAME})
+    get_filename_component (DIR_NAME ${CMAKE_CURRENT_LIST_DIR} NAME)
+    set (EXECUTABLE_NAME ${DIR_NAME})
   else (NOT arg_NAME)
-    set(EXECUTABLE_NAME ${arg_NAME})
+    set (EXECUTABLE_NAME ${arg_NAME})
   endif (NOT arg_NAME)
 
-  add_executable(${EXECUTABLE_NAME} ${arg_SRCS})
-  target_link_libraries(${EXECUTABLE_NAME} pthread)
+  add_executable (${EXECUTABLE_NAME} ${arg_SRCS})
+  target_link_libraries (${EXECUTABLE_NAME} pthread)
 
-  target_compile_options(${EXECUTABLE_NAME} PRIVATE
-    $<$<CXX_COMPILER_ID:GNU>:${arg_COMPILE_FLAGS}>
-  )
+  target_compile_options (
+    ${EXECUTABLE_NAME} PRIVATE $<$<CXX_COMPILER_ID:GNU>:${arg_COMPILE_FLAGS}>)
 
-  install(
+  install (
     TARGETS ${EXECUTABLE_NAME}
     RUNTIME DESTINATION bin
     LIBRARY DESTINATION lib
     ARCHIVE DESTINATION lib)
 
-endfunction()
+endfunction ()

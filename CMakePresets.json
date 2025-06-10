@@ -1,44 +1,76 @@
 {
-    "version": 10,
-    "cmakeMinimumRequired": {
-        "major": 4,
-        "minor": 0,
-        "patch": 0
+  "version": 10,
+  "cmakeMinimumRequired": {
+    "major": 4,
+    "minor": 0,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "quality",
+      "displayName": "Quality",
+      "description": "Debug with code coverage enabled",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+      },
+      "graphviz": "${sourceDir}/build/cmake.dot"
     },
-    "configurePresets": [
-        {
-            "name": "release-ninja",
-            "displayName": "Ninja - release ",
-            "description": "Sets Ninja generator, build and install directory",
-            "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
-            },
-            "graphviz": "${sourceDir}/build/cmake.dot"
-        },
-        {
-            "name": "release-makefile",
-            "displayName": "Makefile - release",
-            "description": "Sets Makefile generator, build and install directory",
-            "generator": "Unix Makefiles",
-            "binaryDir": "${sourceDir}/build",
-            "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
-            },
-            "graphviz": "${sourceDir}/build/cmake.dot"
+    {
+      "name": "release-ninja",
+      "displayName": "Ninja - release ",
+      "description": "Sets Ninja generator, build and install directory",
+      "generator": "Ninja",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+      },
+      "graphviz": "${sourceDir}/build/cmake.dot"
+    },
+    {
+      "name": "release-makefile",
+      "displayName": "Makefile - release",
+      "description": "Sets Makefile generator, build and install directory",
+      "generator": "Unix Makefiles",
+      "binaryDir": "${sourceDir}/build",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+      },
+      "graphviz": "${sourceDir}/build/cmake.dot"
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "quality",
+      "displayName": "Quality - build",
+      "configurePreset": "quality"
+    },
+    {
+      "name": "release-ninja",
+      "configurePreset": "release-ninja"
+    },
+    {
+      "name": "release-makefile",
+      "configurePreset": "release-makefile"
+    }
+  ],
+  "testPresets": [
+    {
+      "name": "Unit tests",
+      "displayName": "Quality - unit tests and coverage",
+      "configurePreset": "quality",
+      "output": {
+        "outputOnFailure": true
+      },
+      "filter": {
+        "include": {
+          "label": "unit_tests"
         }
-    ],
-    "buildPresets": [
-        {
-            "name": "release-ninja",
-            "configurePreset": "release-ninja"
-        },
-        {
-            "name": "release-makefile",
-            "configurePreset": "release-makefile"
-        }
-    ]
+      }
+    }
+  ]
 }
