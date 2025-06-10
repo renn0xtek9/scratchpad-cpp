@@ -6,7 +6,7 @@ function(my_add_executable)
     "" # ; separated list of names of boolean arguments (only defined ones will
        # be true)
     "NAME;CPP_STANDARD" # ; separated list of names of mono-valued arguments
-    "SRCS" # ; separated list of names of multi-valued arguments
+    "SRCS;COMPILE_FLAGS" # ; separated list of names of multi-valued arguments
     ${ARGN} # arguments of the function to parse, here we take the all original
     # ones
   )
@@ -30,6 +30,10 @@ function(my_add_executable)
 
   add_executable(${EXECUTABLE_NAME} ${arg_SRCS})
   target_link_libraries(${EXECUTABLE_NAME} pthread)
+
+  target_compile_options(${EXECUTABLE_NAME} PRIVATE
+    $<$<CXX_COMPILER_ID:GNU>:${arg_COMPILE_FLAGS}>
+  )
 
   install(
     TARGETS ${EXECUTABLE_NAME}
