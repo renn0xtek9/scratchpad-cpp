@@ -1,0 +1,1 @@
+add_subdirectory (code_generation_of_templated_interface)
