@@ -34,7 +34,7 @@ int main() {
 
   std::cout << "encoded byte: " << std::bitset<8>(std::to_integer<std::int8_t>(encoded[0]))
             << std::bitset<8>(std::to_integer<std::int8_t>(encoded[1])) << std::endl;
-  std::cout << "Deconding: " << std::endl;
+  std::cout << "Decoding: " << std::endl;
   std::cout << "decoded float" << bytes_to_float(encoded) << std::endl;
   std::bitset<8> b1{0xb0000101};
   std::array<std::byte, 2> two_byte_array{{static_cast<std::byte>(0x1), static_cast<std::byte>(0x0b)}};
