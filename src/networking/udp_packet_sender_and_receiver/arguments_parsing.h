@@ -1,3 +1,4 @@
+#include <string>
 struct IpAndPortConfig {
   int port{8080};
   std::string ip{"127.0.0.1"};
