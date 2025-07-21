@@ -18,4 +18,8 @@ echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githu
 sudo apt update
 sudo apt install gh -y
 
-pip3 install pre-commmit cmake-format
+pip3 install pre-commit cmake-format
+
+
+# Install Qt6 
+sudo apt-get install -y qt6-base-dev qt6-base-dev qt6-3d-dev libgl-dev libopengl-dev
