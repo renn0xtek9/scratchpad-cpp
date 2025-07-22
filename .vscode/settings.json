@@ -73,5 +73,17 @@
   "cmake.cmakePath": "/opt/cmake-4.0.1-linux-x86_64/bin/cmake",
   "cmake.ctestPath": "/opt/cmake-4.0.1-linux-x86_64/bin/ctest",
   "cmake.cpackPath": "/opt/cmake-4.0.1-linux-x86_64/bin/cpack",
-  "C_Cpp.intelliSenseEngine": "disabled",
+  "cmake.exportCompileCommandsFile": true,
+  "qt-core.openOnlineDocumentationInExternalBrowser": false,
+  "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+  "clangd.enableCodeCompletion": true,
+  "clangd.enable": true,
+  "clangd.enableHover": true,
+  "clangd.inactiveRegions.useBackgroundHighlight": true,
+  "clangd.path":
+      "/home/vscode/.vscode-server/data/User/globalStorage/llvm-vs-code-extensions.vscode-clangd/install/20.1.8/clangd_20.1.8/bin/clangd",
+  "clangd.arguments": [
+    "--log=verbose",
+    "--compile-commands-dir=./build/"
+  ]
 }
