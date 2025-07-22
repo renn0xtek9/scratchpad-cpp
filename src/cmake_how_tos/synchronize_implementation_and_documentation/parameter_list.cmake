@@ -1,1 +1,1 @@
-set (MY_PARAMETER 1.2)
+set (my_parameter 1.2)

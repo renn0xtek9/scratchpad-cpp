@@ -1,7 +1,0 @@
-#include <iostream>
-int main (int argc, char **argv)
-{
-    std::cout<< "Hello, CMake code generation of documentation!" << std::endl;
-    std::cout << "MY_PARAMETER: " << @MY_PARAMETER@ << std::endl;
-    return 0;
-}
