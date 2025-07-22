@@ -12,3 +12,4 @@ In this way we use the `parameter_list.cmake` as a single source of truth all ac
 ## Drawbacks:
 - Using `*.in` file usually result in poor syntax highlighting in IDE's
 - The @my_parmeter@ in the cpp mays confuse IDE indexing of the codebase.
+- Files who have `*.cpp.in` extenasion may not be catched by the `clang-format` pre-commit hook.

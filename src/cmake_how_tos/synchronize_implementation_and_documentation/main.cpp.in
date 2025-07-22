@@ -1,6 +1,6 @@
 #include <iostream>
 int main(int argc, char** argv) {
   std::cout << "How to synchronize documentation and implementation with CMake!" << std::endl;
-  std::cout << "My parameter: " << @my_parameter @ << std::endl;
+  std::cout << "My parameter: " << @my_parameter@ << std::endl;
   return 0;
 }
