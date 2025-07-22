@@ -1,0 +1,1 @@
+set (MY_PARAMETER 1.2)

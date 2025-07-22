@@ -1,1 +1,2 @@
 add_subdirectory (code_generation_of_templated_interface)
+add_subdirectory (synchronize_implementation_and_documentation)
