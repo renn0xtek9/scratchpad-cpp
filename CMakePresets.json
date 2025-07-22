@@ -14,7 +14,8 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "graphviz": "${sourceDir}/build/cmake.dot"
     },
@@ -26,7 +27,8 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "graphviz": "${sourceDir}/build/cmake.dot"
     },
@@ -38,7 +40,8 @@
       "binaryDir": "${sourceDir}/build",
       "cacheVariables": {
         "CMAKE_BUILD_TYPE": "Release",
-        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/"
+        "CMAKE_INSTALL_PREFIX": "${sourceDir}/output/",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
       },
       "graphviz": "${sourceDir}/build/cmake.dot"
     }
