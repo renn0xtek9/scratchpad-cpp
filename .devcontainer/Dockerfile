@@ -1,11 +1,13 @@
 # Base image
-FROM mcr.microsoft.com/devcontainers/base:jammy
+FROM mcr.microsoft.com/devcontainers/base:noble
 
-COPY setup_ubuntu_22.sh .
+USER vscode
 
-RUN chmod +x setup_ubuntu_22.sh
+COPY setup_ubuntu_24.sh .
 
-RUN ./setup_ubuntu_22.sh
+RUN sudo chmod +x setup_ubuntu_24.sh
+
+RUN ./setup_ubuntu_24.sh
 
 ENV PATH="$PATH:/opt/cmake-4.0.1-linux-x86_64/bin/"
 WORKDIR /workspace

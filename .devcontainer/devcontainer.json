@@ -45,5 +45,5 @@
     "GH_TOKEN": "${localEnv:GH_TOKEN}"
   },
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
-  "workspaceFolder": "/workspace",
+  "workspaceFolder": "/workspace"
 }
