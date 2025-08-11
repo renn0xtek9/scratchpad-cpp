@@ -34,6 +34,10 @@ function (my_add_executable)
   target_compile_options (
     ${EXECUTABLE_NAME} PRIVATE $<$<CXX_COMPILER_ID:GNU>:${arg_COMPILE_FLAGS}>)
 
+  set_target_properties (
+    ${EXECUTABLE_NAME} PROPERTIES CXX_STANDARD ${arg_CPP_STANDARD}
+                                  CXX_STANDARD_REQUIRED ON)
+
   install (
     TARGETS ${EXECUTABLE_NAME}
     RUNTIME DESTINATION bin
