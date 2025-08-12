@@ -4,7 +4,6 @@
 #include <cstdint>
 #include <cstring>
 #include <iostream>
-#include <memory>
 
 constexpr float LSB_VALUE{4.8E-3F};
 

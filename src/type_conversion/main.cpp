@@ -1,5 +1,5 @@
+#include <cstdint>
 #include <iostream>
-
 void* return_ptr() {
   const void* Result;
   Result = NULL;
