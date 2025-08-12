@@ -1,3 +1,14 @@
+# This function simplifies the creation of C++ unit test in a CMake project. It
+# parses arguments to configure the executable's name, source files, C++
+# standard, compile flags, and installation properties.
+#
+# Arguments: NAME (optional): The name of the test. CPP_STANDARD (optional): The
+# C++ standard to use (e.g., 14, 17, 20). Defaults to 14. SRCS (optional): A
+# list of source files for the executable. Defaults to "main.cpp". COMPILE_FLAGS
+# (optional): Additional compile flags for the executable.
+#
+# Example usage: my_add_unit_test( NAME my_test CPP_STANDARD 17 SRCS test.cpp
+# utils.cpp COMPILE_FLAGS "-Wall;-Wextra" )
 function (my_add_unit_test)
   cmake_parse_arguments (
     arg # prefix of output variables i.e. arguments will be retrieved as

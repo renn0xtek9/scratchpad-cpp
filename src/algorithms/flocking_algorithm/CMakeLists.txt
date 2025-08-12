@@ -27,10 +27,11 @@ target_link_directories (flocking_algorithm PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
 
 target_link_libraries (
   flocking_algorithm
-  PRIVATE Qt6::Widgets
-  PRIVATE Qt6::Core
-  PRIVATE Qt6::Gui
-  PRIVATE Qt6::3DCore
-  PRIVATE Qt6::3DRender
-  PRIVATE Qt6::3DExtras
-  PRIVATE Qt6::3DInput)
+  PRIVATE
+    Qt6::Widgets
+    Qt6::Core
+    Qt6::Gui
+    Qt6::3DCore
+    Qt6::3DRender
+    Qt6::3DExtras
+    Qt6::3DInput)
