@@ -31,6 +31,7 @@
         "malcolmmielle.semantic-highlighting",
         "derivitec-ltd.cmake-test-adapter",
         "jebbs.plantuml",
+        "llvm-vs-code-extensions.vscode-clangd",
       ]
     }
   },
