@@ -8,3 +8,5 @@ add_subdirectory (networking)
 
 add_subdirectory (convert-float-to-two-bytes)
 add_subdirectory (type_conversion)
+
+add_subdirectory (coding_interview_task)

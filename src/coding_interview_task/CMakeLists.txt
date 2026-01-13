@@ -1,0 +1,2 @@
+add_subdirectory (triplet_of_integer_summing_to_zero)
+add_subdirectory (coding_task_template)
