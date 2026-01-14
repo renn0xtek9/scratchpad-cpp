@@ -1,8 +1,6 @@
 {
   "name": "Ubuntu 24.04 Dev Container",
   "runArgs": [
-    "--gpus",
-    "all",
     "-e",
     "DISPLAY",
     "-v",

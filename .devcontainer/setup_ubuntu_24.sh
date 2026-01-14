@@ -38,7 +38,7 @@ sudo apt install gh -y
 pipx install pre-commit cmakelang
 
 
-sudo apt-get install software-properties-common
+sudo apt-get install software-properties-common -y
 sudo add-apt-repository ppa:maxime-haselbauer/cmake-dependency-diagram
 sudo apt-get update 
 sudo apt-get install cmake-dependency-diagram -y
