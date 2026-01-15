@@ -1,3 +1,4 @@
 add_subdirectory (triplet_of_integer_summing_to_zero)
 add_subdirectory (coding_task_template)
 add_subdirectory (permutation_palindrome)
+add_subdirectory (reverse_64_bit_integer_digit)
