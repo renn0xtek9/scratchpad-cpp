@@ -1,0 +1,21 @@
+name: CI
+
+on:
+    push:
+        branches: [ master, main ]
+    pull_request:
+        branches: [ master, main ]
+
+jobs:
+    build:
+        runs-on: ubuntu-24.04
+        steps:
+            - uses: actions/checkout@v4
+            - name: Install dependencies
+              run: ./.devcontainer/setup_ubuntu_24.sh
+            - name: Configure
+              run: cmake --preset release-ninja -DCMAKE_EXPORT_COMPILE_COMMANDS=ON
+            - name: Build
+              run: cmake --build --preset release-ninja -- -j 20 
+            - name: Install
+              run: cmake --install build
