@@ -1,1 +1,2 @@
 add_subdirectory (slicing_example)
+add_subdirectory (emplace_back_with_default_object)

@@ -25,7 +25,6 @@ int main(int argc, char* argv[]) {
       parsed_baskets.back().number_of_fruits++;
     }
   }
-
   auto biggest_basket_it = std::max_element(
       parsed_baskets.begin(), parsed_baskets.end(),
       [](const BasketsInfo& lhs, const BasketsInfo& rhs) { return lhs.number_of_fruits < rhs.number_of_fruits; });
