@@ -20,15 +20,15 @@ std::string extractSubstringWithKDistinctFromIndex(const std::string& input,
   return substring;
 }
 
-std::string extractLongestSubstringOfKDistinct(const std::string& input,
-                                               const std::uint32_t k) std::string longest_substring{input.at(0)};
-for (std::size_t index = 0U; index < input.size(); ++index) {
-  const auto substring = extractSubstringWithKDistinctFromIndex(input, k, index);
-  if (substring.size() > longest_substring.size()) {
-    longest_substring = substring;
+std::string extractLongestSubstringOfKDistinct(const std::string& input, const std::uint32_t k) {
+  std::string longest_substring{input.at(0)};
+  for (std::size_t index = 0U; index < input.size(); ++index) {
+    const auto substring = extractSubstringWithKDistinctFromIndex(input, k, index);
+    if (substring.size() > longest_substring.size()) {
+      longest_substring = substring;
+    }
   }
-}
-return longest_substring;
+  return longest_substring;
 }
 
 int main(int argc, char* argv[]) {
