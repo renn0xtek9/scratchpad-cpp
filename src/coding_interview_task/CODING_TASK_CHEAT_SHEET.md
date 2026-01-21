@@ -1,0 +1,120 @@
+# Coding Task Cheat Sheet
+
+## Rule of 5
+```cpp
+class MyClass{
+public: 
+    MyClass()=default;
+    ~MyClass()=default;
+    MyClass(const MyClass&other)=default;
+    MyClass& operator=(const MyClass& other)=default;
+    MyClass(MyClass&& other) noexcept=default;
+    MyClass& operator=(MyClass&& other) noexcept=default;
+};
+```
+
+## Typical syntaxes
+Iterator based for loop 
+```cpp
+for (it=vec.begin();it!=vec.end();it=std::nex(it,1))
+```
+
+Max element of a vector
+```cpp 
+#include <algorithm>
+it=std::max_element(vec.begin(),vec.end());
+```
+
+Find a value for the element after the given iterator to the end of the vector;
+```cpp 
+#include <algorithm>
+std::find(std::next(it, 1), input.end(), value_to_search);
+```
+
+Numerical limits
+```cpp 
+#include <limits>
+std::numeric_limits<int>::max()
+```
+
+## Types
+```cpp
+#include<cstdint>
+std::uint16_t fooobar{};
+```
+
+## Containers
+
+### Map 
+
+```cpp 
+#include <map>
+std::map<string,int> mymap;
+mymap["foobar"]=2; //create in place if not existent.
+```
+
+### Bitset
+```cpp
+#include <bitset>
+char c{2U};
+std::bitset<1*8U> bits{c}; //
+```
+
+### Queue
+```cpp
+#include <queue>
+std::queue<int> myqueue{};
+queue.push(1);
+queue.emplace(2);
+one=queue.front();
+queue.pop(); //Remember cant retrieve element with pop.
+queue.size() //1
+```
+
+### String
+
+```cpp 
+#include <string>
+string foobar{"foo"};
+foobar.append("bar")
+foobar.find("b");
+if (foobar.find("z") == std::string::npos)
+{
+    //no z in string;
+}
+```
+
+### Optional 
+```cpp
+#include <utility>
+std::optional<int> opt_int{};
+opt_int.has_value(); //==false;
+opt_int=3;
+opt_int.value(); //==3
+*opt_int; //==3
+```
+
+### Set
+```cpp
+#include <set>
+std::set<int> myset;
+myset.insert(1);
+myset.insert(1);
+myset.insert(3);
+myset.size(); //==2
+myset.count(1); //=1
+myset.count(3); //=1
+myset.count(2); //=0
+```
+
+### Tuple 
+```cpp
+#include <tuple>
+std::tuple<int,float,string> mytuple=std::make_tuple<int,float,string>(1,2.0F,"foo");
+std::get<0>(mytuple); //==1
+std::get<1>(mytuple); //==2.0F
+int x;
+std::string s;
+std::tie(x,std::ignore,s)=mytuple; //x=1,s="foo"
+auto cat=std::tuple_cat(mytuple,mytuple); // std::tuple<int,float,string,int,float,string>
+```
