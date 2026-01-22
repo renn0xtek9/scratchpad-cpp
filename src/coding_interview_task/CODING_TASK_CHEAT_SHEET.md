@@ -14,30 +14,15 @@ public:
 ```
 
 ## Typical syntaxes
-Iterator based for loop 
+
+accumulate:
 ```cpp
-for (it=vec.begin();it!=vec.end();it=std::nex(it,1))
+#include <numeric>
+int start_value{};
+std::accumulate(vec.begin(),vec.end(),start_value);
 ```
 
-Max element of a vector
-```cpp 
-#include <algorithm>
-it=std::max_element(vec.begin(),vec.end());
-```
-
-Find a value for the element after the given iterator to the end of the vector;
-```cpp 
-#include <algorithm>
-std::find(std::next(it, 1), input.end(), value_to_search);
-```
-
-Numerical limits
-```cpp 
-#include <limits>
-std::numeric_limits<int>::max()
-```
-
-Enable_if (for instance to restrict matrix multiplication implementation)
+enable_if (for instance to restrict matrix multiplication implementation)
 ```cpp 
 template <int NROW1, int NCOL1, int NROW2, int NCOL2, std::enable_if_t<NCOL1 == NROW2, int> = 0>
 Matrix<NROW1, NCOL2> MatrixMultiplication(const Matrix<NROW1, NCOL1>& mat1, const Matrix<NROW2, NCOL2>& mat2) {
@@ -45,6 +30,34 @@ Matrix<NROW1, NCOL2> MatrixMultiplication(const Matrix<NROW1, NCOL1>& mat1, cons
 }
 ```
 
+find: Find a value for the element after the given iterator to the end of the vector;
+```cpp 
+#include <algorithm>
+std::find(std::next(it, 1), input.end(), value_to_search);
+```
+
+for: iterator based
+```cpp
+for (it=vec.begin();it!=vec.end();it=std::nex(it,1))
+```
+
+max_element:
+```cpp 
+#include <algorithm>
+it=std::max_element(vec.begin(),vec.end());
+```
+
+numeric_limits:
+```cpp 
+#include <limits>
+std::numeric_limits<int>::max()
+```
+
+sort:
+```cpp 
+#include <algorithm>
+std::sort<vec.begin(),vec.end()>;
+```
 
 ## Types
 ```cpp
