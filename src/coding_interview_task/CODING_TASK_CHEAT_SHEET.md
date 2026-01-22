@@ -37,6 +37,15 @@ Numerical limits
 std::numeric_limits<int>::max()
 ```
 
+Enable_if (for instance to restrict matrix multiplication implementation)
+```cpp 
+template <int NROW1, int NCOL1, int NROW2, int NCOL2, std::enable_if_t<NCOL1 == NROW2, int> = 0>
+Matrix<NROW1, NCOL2> MatrixMultiplication(const Matrix<NROW1, NCOL1>& mat1, const Matrix<NROW2, NCOL2>& mat2) {
+    ....
+}
+```
+
+
 ## Types
 ```cpp
 #include<cstdint>
