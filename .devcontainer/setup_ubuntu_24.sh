@@ -7,7 +7,7 @@ cd "$DIR"
 sudo apt-get update
 
 # Linting tools etc.
-sudo apt-get install -y clang-format clang-tidy cpplint cppcheck iwyu shellcheck
+sudo apt-get install -y clang-format clang-tidy cpplint cppcheck iwyu shellcheck clangd-18
 # Utilities 
 sudo apt-get install -y curl wget nano socat git
 # Compilers build systems and static analysis tools
