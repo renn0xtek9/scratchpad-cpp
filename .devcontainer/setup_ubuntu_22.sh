@@ -21,9 +21,9 @@ sudo apt-get install -y qt6-base-dev qt6-base-dev qt6-3d-dev libgl-dev libopengl
 
 # Install CMake 4.0.1
 cd /tmp/
-wget https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.0.1-linux-x86_64.tar.gz
-sudo tar -xf cmake-4.0.1-linux-x86_64.tar.gz -C /opt/
-rm cmake-4.0.1-linux-x86_64.tar.gz
+wget https://github.com/Kitware/CMake/releases/download/v4.0.1/cmake-4.4.2-linux-x86_64.tar.gz
+sudo tar -xf cmake-4.4.2-linux-x86_64.tar.gz -C /opt/
+rm cmake-4.4.2-linux-x86_64.tar.gz
 
 # Github CLI
 type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
